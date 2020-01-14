@@ -178,10 +178,11 @@ class RNSimpleNativeGeofencing: RCTEventEmitter, CLLocationManagerDelegate, UNUs
             
             self.startMonitoring()
             
-            self.globalDeletionTimer = duration
-            
-            self.globaltimer = Timer.scheduledTimer(timeInterval: 60.0, target: self, selector: #selector(self.globalCountdown), userInfo: nil, repeats: true)
-            
+            if duration > 0 {
+                self.globalDeletionTimer = duration
+                
+                self.globaltimer = Timer.scheduledTimer(timeInterval: 60.0, target: self, selector: #selector(self.globalCountdown), userInfo: nil, repeats: true)
+            }
             
             self.notificationCenter.getNotificationSettings(completionHandler: { (settings) in
                 
