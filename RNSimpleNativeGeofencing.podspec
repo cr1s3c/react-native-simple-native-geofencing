@@ -19,6 +19,4 @@ Pod::Spec.new do |s|
   s.requires_arc = true
 
   s.dependency "React"
-  s.vendored_frameworks = "ios/AST.framework"
-  s.prefix_header_file = "ios/PrefixHeader.pch"
 end
