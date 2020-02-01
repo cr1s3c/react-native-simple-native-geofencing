@@ -421,8 +421,8 @@ class RNSimpleNativeGeofencing: RCTEventEmitter, CLLocationManagerDelegate, UNUs
             }
             
         }else{
-            var didEnterBody: String?
-            var didExitBody: String?
+            var didEnterBody = self.didEnterBody
+            var didExitBody = self.didExitBody
             
             let content = UNMutableNotificationContent()
             content.sound = UNNotificationSound.default
@@ -430,13 +430,13 @@ class RNSimpleNativeGeofencing: RCTEventEmitter, CLLocationManagerDelegate, UNUs
             
             if self.didEnterBody.contains("[value]") {
                 if let value = self.valueDic[region.identifier] {
-                    didEnterBody = self.didEnterBody.replacingOccurrences(of: "[value]", with: value, options: NSString.CompareOptions.literal, range:nil)
+                    didEnterBody = didEnterBody.replacingOccurrences(of: "[value]", with: value, options: NSString.CompareOptions.literal, range:nil)
                 }
             }
             
             if self.didExitBody.contains("[value]") {
                 if let value = self.valueDic[region.identifier] {
-                    didExitBody = self.didExitBody.replacingOccurrences(of: "[value]", with: value, options: NSString.CompareOptions.literal, range:nil)
+                    didExitBody = didExitBody.replacingOccurrences(of: "[value]", with: value, options: NSString.CompareOptions.literal, range:nil)
                 }
             }
             
