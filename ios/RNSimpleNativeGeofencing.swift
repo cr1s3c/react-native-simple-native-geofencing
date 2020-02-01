@@ -42,9 +42,6 @@ class RNSimpleNativeGeofencing: RCTEventEmitter, CLLocationManagerDelegate, UNUs
     var notifyStart = false
     var notifyStop = false
     
-    var globalDeletionTimer = 0
-    var globaltimer: Timer?
-    
     var valueDic: Dictionary<String, String> = [:]
     var locationAuthorized = true
     var notificationAuthorized = true
@@ -106,8 +103,8 @@ class RNSimpleNativeGeofencing: RCTEventEmitter, CLLocationManagerDelegate, UNUs
         
     }
     
-    @objc(addGeofence:duration:)
-    func addGeofence(geofence:NSDictionary, duration:Int) -> Void {
+    @objc(addGeofence:)
+    func addGeofence(geofence:NSDictionary) -> Void {
         
         DispatchQueue.main.async {
             
@@ -148,13 +145,6 @@ class RNSimpleNativeGeofencing: RCTEventEmitter, CLLocationManagerDelegate, UNUs
             geofenceRegion.notifyOnExit = true
             geofenceRegion.notifyOnEntry = true
             
-            
-            if !(duration <= 0) {
-                DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(duration)) {
-                    self.removeGeofence(geofenceKey: id)
-                }
-            }
-            
             self.currentGeofences.append(geofenceRegion)
             
             
@@ -163,8 +153,8 @@ class RNSimpleNativeGeofencing: RCTEventEmitter, CLLocationManagerDelegate, UNUs
     }
     
     
-    @objc(addGeofences:duration:failCallback:)
-    func addGeofences(geofencesArray:NSArray, duration:Int, failCallback: @escaping RCTResponseSenderBlock) -> Void {
+    @objc(addGeofences:failCallback:)
+    func addGeofences(geofencesArray:NSArray, failCallback: @escaping RCTResponseSenderBlock) -> Void {
         
         DispatchQueue.main.async {
             
@@ -176,17 +166,11 @@ class RNSimpleNativeGeofencing: RCTEventEmitter, CLLocationManagerDelegate, UNUs
                     return
                 }
                 
-                self.addGeofence(geofence: geo, duration: 0)
+                self.addGeofence(geofence: geo)
                 
             }
             
             self.startMonitoring()
-            
-            if duration > 0 {
-                self.globalDeletionTimer = duration
-                
-                self.globaltimer = Timer.scheduledTimer(timeInterval: 60.0, target: self, selector: #selector(self.globalCountdown), userInfo: nil, repeats: true)
-            }
             
             self.notificationCenter.getNotificationSettings(completionHandler: { (settings) in
                 
@@ -213,8 +197,8 @@ class RNSimpleNativeGeofencing: RCTEventEmitter, CLLocationManagerDelegate, UNUs
     }
     
     
-    @objc(updateGeofences:duration:)
-    func updateGeofences(geofencesArray:NSArray, duration:Int) -> Void {
+    @objc(updateGeofences:)
+    func updateGeofences(geofencesArray:NSArray) -> Void {
         
         DispatchQueue.main.async {
             
@@ -228,7 +212,7 @@ class RNSimpleNativeGeofencing: RCTEventEmitter, CLLocationManagerDelegate, UNUs
                     return
                 }
                 
-                self.addGeofence(geofence: geo, duration: duration)
+                self.addGeofence(geofence: geo)
                 
             }
             
@@ -239,14 +223,14 @@ class RNSimpleNativeGeofencing: RCTEventEmitter, CLLocationManagerDelegate, UNUs
     }
     
     
-    @objc(addMonitoringBorder:duration:)
-    func addMonitoringBorder(geofence:NSDictionary, duration:Int) -> Void {
+    @objc(addMonitoringBorder:)
+    func addMonitoringBorder(geofence:NSDictionary) -> Void {
         
         DispatchQueue.main.async {
             
             
             //monitoring boarder (needs specific ID)
-            self.addGeofence(geofence: geofence, duration: duration)
+            self.addGeofence(geofence: geofence)
             
             self.startMonitoring()
         }
@@ -407,17 +391,6 @@ class RNSimpleNativeGeofencing: RCTEventEmitter, CLLocationManagerDelegate, UNUs
         }
     }
     
-    @objc func globalCountdown(){
-        
-        globalDeletionTimer = globalDeletionTimer - 60000
-        
-        if globalDeletionTimer <= 0 {
-            self.removeAllGeofences()
-            self.globaltimer?.invalidate()
-        }
-        
-    }
-    
     
     
     
@@ -432,7 +405,6 @@ class RNSimpleNativeGeofencing: RCTEventEmitter, CLLocationManagerDelegate, UNUs
             if didEnter {
                 
                 let body : [String:AnyObject] = [
-                    "durationLeft": self.globalDeletionTimer as AnyObject,
                     "leftMonitoring": "false" as AnyObject
                 ]
                 
@@ -441,7 +413,6 @@ class RNSimpleNativeGeofencing: RCTEventEmitter, CLLocationManagerDelegate, UNUs
             }else{
                 
                 let body : [String:AnyObject] = [
-                    "durationLeft": self.globalDeletionTimer as AnyObject,
                     "leftMonitoring": "true" as AnyObject
                 ]
                 
