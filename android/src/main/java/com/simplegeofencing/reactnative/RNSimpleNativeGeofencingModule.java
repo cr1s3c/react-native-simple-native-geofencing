@@ -34,6 +34,7 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.google.android.gms.location.Geofence.NEVER_EXPIRE;
 import static java.lang.Math.toIntExact;
 
 public class RNSimpleNativeGeofencingModule extends ReactContextBaseJavaModule {
@@ -177,6 +178,7 @@ public class RNSimpleNativeGeofencingModule extends ReactContextBaseJavaModule {
         geofenceObject.getDouble("longitude"),
         geofenceObject.getInt("radius")
       )
+            .setExpirationDuration(NEVER_EXPIRE)
       .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER |
         Geofence.GEOFENCE_TRANSITION_EXIT)
       .build());
