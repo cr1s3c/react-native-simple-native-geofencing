@@ -9,15 +9,11 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.SharedPreferences;
-import android.graphics.BitmapFactory;
 import android.os.Build;
-import android.preference.PreferenceManager;
-import android.support.annotation.NonNull;
-//import android.support.v4.app.NotificationCompat;
-import android.support.v4.app.NotificationCompat;
-import android.support.v4.app.NotificationManagerCompat;
-import android.support.v4.content.LocalBroadcastManager;
+import androidx.annotation.NonNull;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import android.util.Log;
 
 import com.facebook.react.HeadlessJsTaskService;
@@ -27,7 +23,6 @@ import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.Callback;
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
-import com.facebook.react.modules.core.DeviceEventManagerModule;
 import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.GeofencingRequest;
 import com.google.android.gms.location.LocationServices;
@@ -58,11 +53,8 @@ public class RNSimpleNativeGeofencingModule extends ReactContextBaseJavaModule {
   private String[] notifyStopString = new String[2];
   private String[] notifyEnterString = new String[2];
   private String[] notifyExitString = new String[2];
-  private Long mStartTime;
-  private int mDuration;
   private LocalBroadcastReceiver mLocalBroadcastReceiver;
   private LocalBroadcastManager mLocalBroadcastManager;
-  private static final String PREFERENCE_LAST_NOTIF_ID = "PREFERENCE_LAST_NOTIF_ID";
   private ArrayList<String> geofenceValues;
   private ArrayList<String> geofenceKeys;
   private static final String NOTIFICATION_TAG = "GeofenceNotification";
@@ -150,13 +142,12 @@ public class RNSimpleNativeGeofencingModule extends ReactContextBaseJavaModule {
   @ReactMethod
   public void addGeofences(
           ReadableArray geofenceArray,
-          int duration,
           Callback failCallback)
   {
     //Add geohashes
     for (int i = 0; i < geofenceArray.size(); i++) {
       ReadableMap geofence = geofenceArray.getMap(i);
-      addGeofence(geofence, duration);
+      addGeofence(geofence);
     }
     //Start Monitoring
     startMonitoring(failCallback);
@@ -172,13 +163,13 @@ public class RNSimpleNativeGeofencingModule extends ReactContextBaseJavaModule {
     //Add geohashes
     for (int i = 0; i < geofenceArray.size(); i++) {
       ReadableMap geofence = geofenceArray.getMap(i);
-      addGeofence(geofence, duration);
+      addGeofence(geofence);
     }
     silentStartMonitoring();
   }
 
   @ReactMethod
-  public void addGeofence(ReadableMap geofenceObject, int duration) {
+  public void addGeofence(ReadableMap geofenceObject) {
     mGeofenceList.add(new Geofence.Builder()
       .setRequestId(geofenceObject.getString("key"))
       .setCircularRegion(
@@ -186,7 +177,6 @@ public class RNSimpleNativeGeofencingModule extends ReactContextBaseJavaModule {
         geofenceObject.getDouble("longitude"),
         geofenceObject.getInt("radius")
       )
-      .setExpirationDuration(duration)
       .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER |
         Geofence.GEOFENCE_TRANSITION_EXIT)
       .build());
@@ -195,7 +185,6 @@ public class RNSimpleNativeGeofencingModule extends ReactContextBaseJavaModule {
       geofenceKeys.add(geofenceObject.getString("key"));
       geofenceValues.add(geofenceObject.getString("value"));
     }
-    mDuration = duration;
     Log.i(TAG, "Added geofence: Lat " + geofenceObject.getDouble("latitude") + " Long " + geofenceObject.getDouble("longitude"));
   }
 
@@ -210,7 +199,6 @@ public class RNSimpleNativeGeofencingModule extends ReactContextBaseJavaModule {
           public void onSuccess(Void aVoid) {
             Log.i(TAG, "Added Geofences");
             notifyNow("start");
-            mStartTime = System.currentTimeMillis();
             mLocalBroadcastManager.registerReceiver(
                     mLocalBroadcastReceiver, new IntentFilter("outOfMonitorGeofence"));
 
@@ -228,9 +216,9 @@ public class RNSimpleNativeGeofencingModule extends ReactContextBaseJavaModule {
               AlarmManager am = (AlarmManager) reactContext.getSystemService(Context.ALARM_SERVICE);
               am.cancel(contentIntent);
               if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
-                am.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, System.currentTimeMillis()+mDuration, contentIntent);
+                am.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), contentIntent);
               }else{
-                am.setExact(AlarmManager.RTC_WAKEUP, System.currentTimeMillis()+mDuration, contentIntent);
+                am.setExact(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), contentIntent);
               }
 
             }
@@ -364,7 +352,6 @@ public class RNSimpleNativeGeofencingModule extends ReactContextBaseJavaModule {
     intent.putExtra("notifyChannelStringTitle", notifyChannelString[0]);
     intent.putExtra("notifyChannelStringDescription", notifyChannelString[1]);
     intent.putExtra("startTime", (Long) System.currentTimeMillis());
-    intent.putExtra("duration", mDuration);
     intent.putStringArrayListExtra("geofenceKeys", geofenceKeys);
     intent.putStringArrayListExtra("geofenceValues", geofenceValues);
     // We use FLAG_UPDATE_CURRENT so that we get the same pending intent back when
