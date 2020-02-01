@@ -28,8 +28,10 @@ class RNSimpleNativeGeofencing: RCTEventEmitter, CLLocationManagerDelegate, UNUs
     
     var didEnterTitle = ""
     var didEnterBody = ""
+    var didEnterCategory = ""
     var didExitTitle = ""
     var didExitBody = ""
+    var didExitCategory = ""
     var startTrackingTitle = ""
     var startTrackingBody = ""
     var stopTrackingTitle = ""
@@ -91,8 +93,10 @@ class RNSimpleNativeGeofencing: RCTEventEmitter, CLLocationManagerDelegate, UNUs
             
             self.didEnterTitle = settings.value(forKeyPath: "enter.title") as? String ?? "Be careful!"
             self.didEnterBody = settings.value(forKeyPath: "enter.description") as? String ?? "It may be dangerous in the area where you are currently staying."
+            self.didEnterCategory = settings.value(forKeyPath: "enter.category") as? String ?? ""
             self.didExitTitle = settings.value(forKeyPath: "exit.title") as? String ?? ""
             self.didExitBody = settings.value(forKeyPath: "exit.description") as? String ?? ""
+            self.didExitCategory = settings.value(forKeyPath: "exit.category") as? String ?? ""
             self.startTrackingTitle = settings.value(forKeyPath: "start.title") as? String ?? ""
             self.startTrackingBody = settings.value(forKeyPath: "start.description") as? String ??  ""
             self.stopTrackingTitle = settings.value(forKeyPath: "stop.title") as? String ?? ""
@@ -468,10 +472,12 @@ class RNSimpleNativeGeofencing: RCTEventEmitter, CLLocationManagerDelegate, UNUs
             if didEnter {
                 content.title = self.didEnterTitle
                 content.body = self.didEnterBody
+                content.categoryIdentifier = self.didEnterCategory
                 identifier = "enter: \(region.identifier)"
             }else{
                 content.title = self.didExitTitle
                 content.body = self.didExitBody
+                content.categoryIdentifier = self.didExitCategory
                 identifier = "exit: \(region.identifier)"
             }
             
