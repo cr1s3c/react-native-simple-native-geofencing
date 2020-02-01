@@ -8,18 +8,14 @@
 
 RCT_EXTERN_METHOD(initNotification: (NSDictionary *)settings)
 
-RCT_EXTERN_METHOD(addGeofence:  (NSDictionary *)geofence
-                  duration:(NSInteger *)duration)
+RCT_EXTERN_METHOD(addGeofence:  (NSDictionary *)geofence)
 
 RCT_EXTERN_METHOD(addGeofences: (NSArray *)geofencesArray
-                  duration:(NSInteger *)duration
                   failCallback:(RCTResponseSenderBlock *)failCallback)
 
-RCT_EXTERN_METHOD(updateGeofences:  (NSArray *)geofencesArray
-                  duration:(NSInteger *)duration)
+RCT_EXTERN_METHOD(updateGeofences:  (NSArray *)geofencesArray)
 
-RCT_EXTERN_METHOD(addMonitoringBorder:  (NSDictionary *)geofence
-                  duration:(NSInteger *)duration)
+RCT_EXTERN_METHOD(addMonitoringBorder:  (NSDictionary *)geofence)
 
 RCT_EXTERN_METHOD(removeMonitoringBorder)
 
