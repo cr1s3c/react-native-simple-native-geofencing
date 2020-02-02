@@ -46,7 +46,9 @@ class RNSimpleNativeGeofencing: RCTEventEmitter, CLLocationManagerDelegate, UNUs
     var locationAuthorized = true
     var notificationAuthorized = true
     
-    
+    override class func requiresMainQueueSetup() -> Bool {
+        return true
+    }
     
     override func supportedEvents() -> [String]! {
         return ["leftMonitoringBorderWithDuration"]
