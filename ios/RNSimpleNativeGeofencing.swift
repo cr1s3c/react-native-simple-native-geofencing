@@ -423,6 +423,8 @@ class RNSimpleNativeGeofencing: RCTEventEmitter, CLLocationManagerDelegate, UNUs
             }
             
         }else{
+            var didEnterBody = self.didEnterBody
+            var didExitBody = self.didExitBody
             
             let content = UNMutableNotificationContent()
             content.sound = UNNotificationSound.default
@@ -430,13 +432,13 @@ class RNSimpleNativeGeofencing: RCTEventEmitter, CLLocationManagerDelegate, UNUs
             
             if self.didEnterBody.contains("[value]") {
                 if let value = self.valueDic[region.identifier] {
-                    self.didEnterBody = self.didEnterBody.replacingOccurrences(of: "[value]", with: value, options: NSString.CompareOptions.literal, range:nil)
+                    didEnterBody = didEnterBody.replacingOccurrences(of: "[value]", with: value, options: NSString.CompareOptions.literal, range:nil)
                 }
             }
             
             if self.didExitBody.contains("[value]") {
                 if let value = self.valueDic[region.identifier] {
-                    self.didExitBody = self.didExitBody.replacingOccurrences(of: "[value]", with: value, options: NSString.CompareOptions.literal, range:nil)
+                    didExitBody = didExitBody.replacingOccurrences(of: "[value]", with: value, options: NSString.CompareOptions.literal, range:nil)
                 }
             }
             
@@ -444,12 +446,12 @@ class RNSimpleNativeGeofencing: RCTEventEmitter, CLLocationManagerDelegate, UNUs
             
             if didEnter {
                 content.title = self.didEnterTitle
-                content.body = self.didEnterBody
+                content.body = didEnterBody
                 content.categoryIdentifier = self.didEnterCategory
                 identifier = "enter: \(region.identifier)"
             }else{
                 content.title = self.didExitTitle
-                content.body = self.didExitBody
+                content.body = didExitBody
                 content.categoryIdentifier = self.didExitCategory
                 identifier = "exit: \(region.identifier)"
             }
